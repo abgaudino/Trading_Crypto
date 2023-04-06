@@ -1,0 +1,41 @@
+##'pip'
+# Install necessary libraries if not already installed
+# You can uncomment and run the following lines to install the libraries
+
+# Uncomment the lines below to install ccxt library
+# !pip install ccxt
+
+# Uncomment the lines below to install pandas library
+# !pip install pandas
+
+# Uncomment the lines below to install openpyxl library
+# !pip install openpyxl
+
+# Import the necessary libraries
+import ccxt
+import pandas as pd
+from openpyxl.styles import PatternFill
+import time
+
+# Rest of the code...
+
+## 'conda'
+# Install necessary libraries if not already installed
+# You can uncomment and run the following lines to install the libraries
+
+# Uncomment the lines below to install ccxt library
+# !conda install -c anaconda ccxt -y
+
+# Uncomment the lines below to install pandas library
+# !conda install -c anaconda pandas -y
+
+# Uncomment the lines below to install openpyxl library
+# !conda install -c anaconda openpyxl -y
+
+# Import the necessary libraries
+import ccxt
+import pandas as pd
+from openpyxl.styles import PatternFill
+import time
+
+# Rest of the code...
