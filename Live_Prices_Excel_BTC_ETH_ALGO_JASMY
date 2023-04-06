@@ -1,0 +1,65 @@
+import ccxt
+import pandas as pd
+from openpyxl.styles import PatternFill
+import time
+
+# Initialize the CCXT exchange object
+exchange = ccxt.binance()
+
+# Create an Excel file titled "Live_Prices"
+excel_file = "Live_Prices.xlsx"
+writer = pd.ExcelWriter(excel_file, engine='openpyxl')
+writer.save()
+
+while True:
+    try:
+        # Fetch live prices from the exchange
+        tickers = exchange.fetch_tickers(symbols=['BTC/USDT', 'ETH/USDT', 'ALGO/USDT', 'JASMY/USDT'])
+        
+        # Convert the tickers to a DataFrame
+        df = pd.DataFrame(tickers)
+        df = df.transpose()
+        
+        # Extract relevant columns for BTC/USD, ETH/USD, ALGO/USD, and JASMY/USD
+        df = df[['symbol', 'bid', 'ask', 'last']]
+        df.columns = ['Symbol', 'Bid', 'Ask', 'Last']
+        
+        # Convert prices to floats
+        df['Bid'] = df['Bid'].astype(float)
+        df['Ask'] = df['Ask'].astype(float)
+        df['Last'] = df['Last'].astype(float)
+        
+        # Calculate price change percentage
+        df['Price Change %'] = ((df['Last'] - df['Bid']) / df['Bid']) * 100
+        
+        # Load the existing Excel file
+        writer = pd.ExcelWriter(excel_file, engine='openpyxl') 
+        writer.book = writer.load_workbook(excel_file)
+        
+        # Write the DataFrame to the Excel file
+        df.to_excel(writer, index=False, sheet_name='Prices', startrow=1, header=False)
+        writer.sheets['Prices'].column_dimensions['A'].width = 20
+        writer.sheets['Prices'].column_dimensions['B'].width = 15
+        writer.sheets['Prices'].column_dimensions['C'].width = 15
+        writer.sheets['Prices'].column_dimensions['D'].width = 15
+        
+        # Set fill colors for cells based on price change percentage
+        red_fill = PatternFill(start_color='FFFF00', end_color='FFFF00', fill_type='solid')
+        green_fill = PatternFill(start_color='00FF00', end_color='00FF00', fill_type='solid')
+        for row in writer.sheets['Prices']['E']:
+            for cell in row:
+                if cell.value is not None and cell.column == 'E' and cell.row > 1:
+                    if cell.value <= -1:
+                        cell.fill = red_fill
+                    elif cell.value >= 1:
+                        cell.fill = green_fill
+        
+        # Save the Excel file
+        writer.save()
+        
+        print("Live prices updated successfully!")
+    except Exception as e:
+        print("Error updating live prices:", str(e))
+    
+    # Sleep for 15 minutes
+    time.sleep(900)
